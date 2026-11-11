@@ -2,132 +2,124 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- Anciens liens de liste d'envies (…/?t=jeton) : on les envoie vers leur nouvelle adresse. -->
+<script>if (new URLSearchParams(location.search).has('t')) location.replace('liste/' + location.search);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Liste d'envies — Anniveil</title>
-<style>
-  :root { --ink:#1D1B2C; --muted:#5E5A72; --line:#E4E0EE; --ground:#F5F3FA; --card:#fff; --orange:#FF6B3D; --soft:#FFE6DC; --deep:#9E3412; --green:#17734B; --green-soft:#DFF5EA; }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--ground); color:var(--ink); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
-  main { max-width:520px; margin:0 auto; padding:28px 20px 48px; }
-  .brand { text-align:center; font-weight:800; font-size:22px; letter-spacing:-.5px; }
-  .brand span { color:var(--orange); }
-  h1 { text-align:center; font-size:26px; line-height:1.15; margin:10px 0 20px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:4px 16px; }
-  .wish { display:flex; align-items:center; gap:12px; padding:12px 0; }
-  .wish + .wish { border-top:1px solid var(--line); }
-  .pic { width:48px; height:48px; flex:none; border-radius:12px; background:var(--soft); object-fit:cover; display:flex; align-items:center; justify-content:center; font-size:22px; }
-  .grow { flex:1; min-width:0; }
-  .title { font-weight:600; }
-  .sub { font-size:13px; color:var(--muted); }
-  a { color:var(--deep); }
-  button { font:inherit; font-weight:700; border:0; border-radius:99px; height:40px; padding:0 16px; background:var(--orange); color:var(--ink); cursor:pointer; white-space:nowrap; }
-  button:disabled { opacity:.5; cursor:default; }
-  .pill { font-size:13px; font-weight:700; padding:6px 12px; border-radius:99px; background:var(--green-soft); color:var(--green); white-space:nowrap; }
-  .note { text-align:center; color:var(--muted); font-size:14px; margin-top:16px; }
-  .empty { text-align:center; color:var(--muted); padding:40px 8px; }
-  input { font:inherit; width:100%; height:44px; border-radius:12px; border:1px solid var(--line); padding:0 12px; margin:16px 0 0; background:var(--card); }
-</style>
+<title>Anniveil — le réveil qui sonne pour les anniversaires</title>
+<meta name="description" content="Anniveil lit les anniversaires de vos agendas, sonne le matin du jour J et prépare le message à envoyer. Sur Android et iPhone.">
+<meta name="theme-color" content="#1d1b2c">
+<link rel="icon" href="assets/icone.svg" type="image/svg+xml">
+<link rel="preload" href="assets/BricolageGrotesque.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+
+<header class="nuit">
+  <div class="cadre">
+    <div class="entete">
+      <a class="marque" href="./" aria-label="Anniveil, accueil"><img src="assets/cloche.svg" alt=""><span>Anniveil</span></a>
+      <nav aria-label="Liens utiles"><a href="confidentialite/">Confidentialité</a></nav>
+    </div>
+
+    <div class="ouverture">
+      <div>
+        <h1>Le réveil qui sonne pour les anniversaires.</h1>
+        <p class="chapo">Anniveil lit les anniversaires de vos agendas et sonne le matin du jour J, comme un vrai réveil. Le message est déjà prêt&nbsp;: il ne reste qu'à l'envoyer.</p>
+        <p class="dispo"><i aria-hidden="true"></i>Bientôt sur Android et iPhone</p>
+      </div>
+      <div class="tel"><img src="assets/alarm.webp" width="720" height="1558" alt="Écran d'alarme d'Anniveil&nbsp;: il est 9 h, c'est l'anniversaire de Léa Martin, 32 ans. Trois boutons&nbsp;: souhaiter maintenant, reporter d'une heure, passer."></div>
+    </div>
+  </div>
+</header>
+
 <main>
-  <div class="brand">Anni<span>veil</span></div>
-  <h1 id="heading">Liste d'envies</h1>
-  <div id="content"><p class="empty">Chargement…</p></div>
+  <section class="cadre journee" aria-labelledby="titre-journee">
+    <h2 id="titre-journee">Le jour J, heure par heure</h2>
+    <p class="intro">Une notification se balaie et s'oublie. Une alarme, non. Voici ce qu'Anniveil fait autour d'un anniversaire, du rappel cadeau au dernier appel du soir.</p>
+
+    <ol class="etapes">
+      <li class="etape">
+        <div class="heure">J−7</div>
+        <div>
+          <h3>Le cadeau, pendant qu'il est encore temps</h3>
+          <p>Une idée vous vient en mars pour un anniversaire de novembre&nbsp;: notez-la sur la fiche du proche, ou partagez un lien depuis une boutique. Une semaine avant, Anniveil vous la rappelle.</p>
+        </div>
+        <div class="tel"><img src="assets/contact.webp" width="720" height="1695" loading="lazy" alt="Fiche d'un proche, avec sa date d'anniversaire et ses idées cadeaux."></div>
+      </li>
+
+      <li class="etape">
+        <div class="heure">9:00</div>
+        <div>
+          <h3>L'alarme sonne, même téléphone verrouillé</h3>
+          <p>Plein écran, avec une vraie sonnerie. Vous choisissez&nbsp;: souhaiter tout de suite, reporter à plus tard dans la journée, ou passer. L'heure, la sonnerie et le vibreur se règlent, et tout peut se couper.</p>
+        </div>
+        <div class="tel"><img src="assets/home.webp" width="720" height="1558" loading="lazy" alt="Accueil d'Anniveil&nbsp;: les anniversaires du jour en tête, puis ceux des jours à venir."></div>
+      </li>
+
+      <li class="etape">
+        <div class="heure">9:01</div>
+        <div>
+          <h3>Un message prêt, à votre façon</h3>
+          <p>Trois propositions avec le prénom et l'âge, dans le ton que vous voulez&nbsp;: chaleureux, drôle, sobre ou poétique. Vous retouchez si besoin, puis vous l'envoyez par WhatsApp, par SMS ou par l'appli de votre choix. Anniveil n'envoie jamais rien à votre place.</p>
+        </div>
+        <div class="tel"><img src="assets/message-chaleureux.webp" width="720" height="1558" loading="lazy" alt="Écran Message&nbsp;: trois propositions de message d'anniversaire au ton chaleureux."></div>
+      </li>
+
+      <li class="etape sans-ecran">
+        <div class="heure">23:00</div>
+        <div>
+          <h3>Il reste une heure</h3>
+          <p>Journée chargée, anniversaire toujours en attente&nbsp;: un dernier rappel sonne avant minuit. Et si le jour est passé, Anniveil propose un message de rattrapage le lendemain.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="partage" aria-labelledby="titre-partage">
+    <div class="cadre">
+      <h2 id="titre-partage">À plusieurs, c'est plus simple</h2>
+      <div class="duo">
+        <article>
+          <div class="tel"><img src="assets/wishlist.webp" width="720" height="1558" loading="lazy" alt="Liste d'envies dans l'app."></div>
+          <div>
+            <h3>Le foyer</h3>
+            <p>Invitez la personne avec qui vous vivez&nbsp;: vous partagez vos idées cadeaux pour les proches. Quand l'un coche « offert », l'autre le voit, et personne n'achète deux fois le même livre.</p>
+          </div>
+        </article>
+        <article>
+          <div class="tel"><img src="assets/wishpage-reserve.webp" width="720" height="1558" loading="lazy" alt="Page web d'une liste d'envies&nbsp;: un visiteur a réservé un cadeau."></div>
+          <div>
+            <h3>La liste d'envies</h3>
+            <p>Envoyez un lien à vos proches. Ils voient vos envies sur une page web, sans installer l'app, et réservent ce qu'ils offrent. Les réservations ne s'affichent pas dans votre app&nbsp;: la surprise reste entière.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="donnees" aria-labelledby="titre-donnees">
+    <div class="cadre">
+      <h2 id="titre-donnees">Vos proches ne sont pas un produit</h2>
+      <ul class="faits">
+        <li><strong>Vos agendas restent sur le téléphone</strong>Anniveil les lit sur l'appareil. Les événements d'agenda ne sont jamais envoyés sur un serveur.</li>
+        <li><strong>Le compte est facultatif</strong>Sans compte, tout fonctionne et rien ne quitte le téléphone. Le compte sert à sauvegarder et à partager.</li>
+        <li><strong>Ni publicité, ni pistage</strong>Aucun outil de mesure d'audience, aucun traceur, ni dans l'app ni sur ce site.</li>
+        <li><strong>Supprimer, c'est supprimer</strong>La suppression du compte efface vos données en ligne tout de suite, depuis les réglages de l'app.</li>
+      </ul>
+      <p class="suite"><a href="confidentialite/">Lire la politique de confidentialité</a></p>
+    </div>
+  </section>
 </main>
-<script>
-// À renseigner avec le projet Supabase : son adresse et sa clé publique (faite pour être publiée).
-const SUPABASE_URL = 'https://pccshmcecipummjglduo.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1csTlafe8NNmsVXvz681WA_CCULRA_T';
 
-const token = new URLSearchParams(location.search).get('t') || '';
-const content = document.getElementById('content');
-const heading = document.getElementById('heading');
+<footer class="pied">
+  <div class="cadre">
+    <a class="marque" href="./"><img src="assets/cloche.svg" alt=""><span>Anniveil</span></a>
+    <nav aria-label="Informations">
+      <a href="confidentialite/">Confidentialité</a>
+      <a href="suppression-compte/">Supprimer mon compte</a>
+    </nav>
+  </div>
+</footer>
 
-function el(tag, props = {}, children = []) {
-  const node = Object.assign(document.createElement(tag), props);
-  children.forEach((c) => node.append(c));
-  return node;
-}
-
-async function rpc(name, body) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: 'POST',
-    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) throw new Error(String(response.status));
-  return response.json();
-}
-
-function unavailable(text) {
-  heading.textContent = "Liste d'envies";
-  content.replaceChildren(el('p', { className: 'empty', textContent: text }));
-}
-
-function safeUrl(value) {
-  try {
-    const u = new URL(value);
-    return u.protocol === 'https:' || u.protocol === 'http:' ? u : null;
-  } catch { return null; }
-}
-
-function render(list) {
-  const name = list.name || '';
-  heading.textContent = name ? `Les envies ${/^[aeiouyhéèêAEIOUYHÉÈÊ]/.test(name) ? "d'" : 'de '}${name}` : "Liste d'envies";
-  if (!list.wishes.length) return unavailable('Cette liste est encore vide.');
-
-  const visitor = el('input', { placeholder: 'Ton prénom (facultatif)', maxLength: 60, autocomplete: 'given-name' });
-  const card = el('div', { className: 'card' });
-  for (const w of list.wishes) {
-    const link = w.url && safeUrl(w.url);
-    const image = w.image && safeUrl(w.image);
-    const pic = image
-      ? el('img', { className: 'pic', src: image.href, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' })
-      : el('div', { className: 'pic', textContent: '🎁' });
-    const sub = el('div', { className: 'sub' });
-    if (w.price) sub.append(w.price);
-    if (link) {
-      if (w.price) sub.append(' · ');
-      sub.append(el('a', { href: link.href, target: '_blank', rel: 'noopener noreferrer', textContent: link.hostname.replace(/^www\./, '') }));
-    }
-    let action;
-    if (w.reserved) {
-      action = el('span', { className: 'pill', textContent: 'Réservé' });
-    } else {
-      action = el('button', { textContent: "Je l'offre" });
-      action.addEventListener('click', async () => {
-        action.disabled = true;
-        try {
-          const mine = await rpc('reserve_wish', { link: token, wish: w.id, visitor: visitor.value.trim() });
-          if (!mine) alert("Quelqu'un vient de réserver cette envie.");
-        } catch {
-          alert('La réservation a échoué. Vérifie ta connexion et réessaie.');
-        }
-        load();
-      });
-    }
-    card.append(el('div', { className: 'wish' }, [pic, el('div', { className: 'grow' }, [el('div', { className: 'title', textContent: w.title }), sub]), action]));
-  }
-  content.replaceChildren(
-    card,
-    visitor,
-    el('p', { className: 'note', textContent: `${name || 'La personne'} ne voit pas les réservations dans l'app : la surprise reste entière.` }),
-  );
-}
-
-async function load() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return unavailable("Cette page n'est pas encore configurée.");
-  if (!token) return unavailable('Liste indisponible.');
-  try {
-    const list = await rpc('get_wishlist', { link: token });
-    if (!list) return unavailable('Liste indisponible.');
-    render(list);
-  } catch {
-    unavailable('Impossible de charger la liste. Vérifie ta connexion et réessaie.');
-  }
-}
-load();
-</script>
 </body>
 </html>
