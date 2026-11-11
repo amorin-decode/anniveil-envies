@@ -21,12 +21,25 @@
   .title { font-weight:600; }
   .sub { font-size:13px; color:var(--muted); }
   a { color:var(--deep); }
-  button { font:inherit; font-weight:700; border:0; border-radius:99px; height:40px; padding:0 16px; background:var(--orange); color:var(--ink); cursor:pointer; white-space:nowrap; }
+  button { font:inherit; font-weight:700; border:0; border-radius:99px; height:40px; padding:0 16px; background:var(--orange); color:#fff; cursor:pointer; white-space:nowrap; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  button.link { background:none; color:var(--muted); height:auto; padding:4px 0 0; font-size:12px; font-weight:600; text-decoration:underline; display:block; margin-left:auto; }
+  .state { text-align:right; flex:none; }
+  .heart { color:var(--orange); margin-right:4px; }
+  dialog { border:0; border-radius:24px; padding:22px; width:min(92vw, 420px); background:var(--card); color:var(--ink); }
+  dialog::backdrop { background:rgba(29,27,44,.45); }
+  dialog h2 { font-size:21px; margin:0 0 6px; }
+  dialog p { margin:0; font-size:14px; color:var(--muted); }
+  dialog label { display:block; font-size:13px; font-weight:600; margin-top:14px; }
+  dialog input { margin-top:6px; }
+  dialog .error { color:#C22F2F; min-height:20px; margin-top:10px; }
+  dialog .row { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+  :focus-visible { outline:3px solid #FFD25E; outline-offset:2px; }
   button:disabled { opacity:.5; cursor:default; }
   .pill { font-size:13px; font-weight:700; padding:6px 12px; border-radius:99px; background:var(--green-soft); color:var(--green); white-space:nowrap; }
   .note { text-align:center; color:var(--muted); font-size:14px; margin-top:16px; }
   .empty { text-align:center; color:var(--muted); padding:40px 8px; }
-  input { font:inherit; width:100%; height:44px; border-radius:12px; border:1px solid var(--line); padding:0 12px; margin:16px 0 0; background:var(--card); }
+  input { font:inherit; width:100%; height:44px; border-radius:12px; border:1px solid var(--line); padding:0 12px; background:var(--card); color:var(--ink); }
 </style>
 </head>
 <body>
@@ -35,6 +48,19 @@
   <h1 id="heading">Liste d'envies</h1>
   <div id="content"><p class="empty">Chargement…</p></div>
 </main>
+<dialog id="dialog">
+  <form method="dialog" id="form" novalidate>
+    <h2 id="dialog-title"></h2>
+    <p id="dialog-text"></p>
+    <label id="name-field">Ton nom<input id="name" maxlength="60" autocomplete="name" required></label>
+    <label>Ton e-mail<input id="email" type="email" maxlength="200" autocomplete="email" inputmode="email" required></label>
+    <p class="error" id="dialog-error" role="alert"></p>
+    <div class="row">
+      <button type="button" class="ghost" id="dialog-cancel">Annuler</button>
+      <button type="submit" id="dialog-ok"></button>
+    </div>
+  </form>
+</dialog>
 <script>
 // À renseigner avec le projet Supabase : son adresse et sa clé publique (faite pour être publiée).
 const SUPABASE_URL = 'https://pccshmcecipummjglduo.supabase.co';
@@ -72,13 +98,51 @@ function safeUrl(value) {
   } catch { return null; }
 }
 
+const dialog = document.getElementById('dialog');
+const field = (id) => document.getElementById(id);
+field('dialog-cancel').addEventListener('click', () => dialog.close());
+
+// Le nom et l'e-mail restent dans ce navigateur, pour ne pas les retaper.
+function remembered(key) { try { return localStorage.getItem(key) || ''; } catch { return ''; } }
+function remember(key, value) { try { localStorage.setItem(key, value); } catch { /* navigation privée */ } }
+
+/// Demande le nom et l'e-mail (ou l'e-mail seul pour annuler), puis appelle [send].
+/// [send] rend un message d'erreur à afficher, ou rien quand c'est fait.
+function ask({ title, text, ok, withName, send }) {
+  field('dialog-title').textContent = title;
+  field('dialog-text').textContent = text;
+  field('dialog-ok').textContent = ok;
+  field('dialog-error').textContent = '';
+  field('name-field').hidden = !withName;
+  field('name').value = remembered('anniveil-nom');
+  field('email').value = remembered('anniveil-mail');
+  field('form').onsubmit = async (event) => {
+    event.preventDefault();
+    const name = field('name').value.trim();
+    const email = field('email').value.trim();
+    if (withName && !name) { field('dialog-error').textContent = 'Indique ton nom.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { field('dialog-error').textContent = 'Indique un e-mail valable.'; return; }
+    field('dialog-ok').disabled = true;
+    let error;
+    try { error = await send(name, email); } catch { error = 'Cela a échoué. Vérifie ta connexion et réessaie.'; }
+    field('dialog-ok').disabled = false;
+    if (error) { field('dialog-error').textContent = error; return; }
+    if (withName) remember('anniveil-nom', name);
+    remember('anniveil-mail', email);
+    dialog.close();
+    load();
+  };
+  dialog.showModal();
+  field(withName && !field('name').value ? 'name' : 'email').focus();
+}
+
 function render(list) {
   // Majuscule au prénom, même s'il a été saisi en minuscules.
   const name = (list.name || '').trim().replace(/(^|[\s\-'’])(\p{Ll})/gu, (m, a, b) => a + b.toUpperCase());
+  const who = name || 'La personne';
   heading.textContent = name ? `Les envies ${/^[aeiouyhéèêAEIOUYHÉÈÊ]/.test(name) ? "d'" : 'de '}${name}` : "Liste d'envies";
   if (!list.wishes.length) return unavailable('Cette liste est encore vide.');
 
-  const visitor = el('input', { placeholder: 'Ton prénom (facultatif)', maxLength: 60, autocomplete: 'given-name' });
   const card = el('div', { className: 'card' });
   for (const w of list.wishes) {
     const link = w.url && safeUrl(w.url);
@@ -86,34 +150,49 @@ function render(list) {
     const pic = image
       ? el('img', { className: 'pic', src: image.href, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' })
       : el('div', { className: 'pic', textContent: '🎁' });
+    const title = el('div', { className: 'title' });
+    if (w.favorite) title.append(el('span', { className: 'heart', textContent: '♥', title: 'Coup de cœur' }));
+    title.append(w.title);
     const sub = el('div', { className: 'sub' });
-    if (w.price) sub.append(w.price);
-    if (link) {
-      if (w.price) sub.append(' · ');
-      sub.append(el('a', { href: link.href, target: '_blank', rel: 'noopener noreferrer', textContent: link.hostname.replace(/^www\./, '') }));
-    }
-    let action;
+    const parts = [];
+    if (w.note) parts.push(w.note);
+    if (w.price) parts.push(w.price);
+    if (link) parts.push(el('a', { href: link.href, target: '_blank', rel: 'noopener noreferrer', textContent: link.hostname.replace(/^www\./, '') }));
+    parts.forEach((part, i) => { if (i) sub.append(' · '); sub.append(part); });
+
+    const state = el('div', { className: 'state' });
     if (w.reserved) {
-      action = el('span', { className: 'pill', textContent: 'Réservé' });
+      const undo = el('button', { className: 'link', type: 'button', textContent: 'Annuler ma réservation' });
+      undo.addEventListener('click', () => ask({
+        title: 'Annuler ma réservation',
+        text: `Redonne l'e-mail utilisé pour réserver « ${w.title} ».`,
+        ok: 'Libérer ce cadeau',
+        withName: false,
+        send: async (_, email) =>
+          (await rpc('release_wish', { link: token, wish: w.id, email })) ? null : "Cet e-mail n'est pas celui de la réservation.",
+      }));
+      state.append(el('span', { className: 'pill', textContent: 'Réservé' }), undo);
     } else {
-      action = el('button', { textContent: "Je l'offre" });
-      action.addEventListener('click', async () => {
-        action.disabled = true;
-        try {
-          const mine = await rpc('reserve_wish', { link: token, wish: w.id, visitor: visitor.value.trim() });
-          if (!mine) alert("Quelqu'un vient de réserver cette envie.");
-        } catch {
-          alert('La réservation a échoué. Vérifie ta connexion et réessaie.');
-        }
-        load();
-      });
+      const offer = el('button', { type: 'button', textContent: "Je l'offre" });
+      offer.addEventListener('click', () => ask({
+        title: `Offrir « ${w.title} »`,
+        text: `Ton nom et ton e-mail servent à retrouver ta réservation, et à l'annuler si tu changes d'avis. ${who} ne les voit pas.`,
+        ok: 'Réserver',
+        withName: true,
+        send: async (visitor, email) => ({
+          ok: null,
+          taken: "Quelqu'un vient de réserver ce cadeau.",
+          invalid: 'Indique ton nom et un e-mail valable.',
+          unavailable: "Ce cadeau n'est plus dans la liste.",
+        })[await rpc('reserve_wish', { link: token, wish: w.id, visitor, email })],
+      }));
+      state.append(offer);
     }
-    card.append(el('div', { className: 'wish' }, [pic, el('div', { className: 'grow' }, [el('div', { className: 'title', textContent: w.title }), sub]), action]));
+    card.append(el('div', { className: 'wish' }, [pic, el('div', { className: 'grow' }, [title, sub]), state]));
   }
   content.replaceChildren(
     card,
-    visitor,
-    el('p', { className: 'note', textContent: `${name || 'La personne'} ne voit pas les réservations dans l'app : la surprise reste entière.` }),
+    el('p', { className: 'note', textContent: `${who} ne voit pas les réservations : la surprise reste entière.` }),
   );
 }
 
