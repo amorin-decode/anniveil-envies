@@ -73,7 +73,8 @@ function safeUrl(value) {
 }
 
 function render(list) {
-  const name = list.name || '';
+  // Majuscule au prénom, même s'il a été saisi en minuscules.
+  const name = (list.name || '').trim().replace(/(^|[\s\-'’])(\p{Ll})/gu, (m, a, b) => a + b.toUpperCase());
   heading.textContent = name ? `Les envies ${/^[aeiouyhéèêAEIOUYHÉÈÊ]/.test(name) ? "d'" : 'de '}${name}` : "Liste d'envies";
   if (!list.wishes.length) return unavailable('Cette liste est encore vide.');
 
